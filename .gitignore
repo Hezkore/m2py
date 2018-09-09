@@ -1,0 +1,8 @@
+*.bak
+*.buildv*
+*.products/
+*.app
+*.DS_*
+*.lnk
+Thumbs.db
+.mx2/
