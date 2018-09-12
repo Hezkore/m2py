@@ -1,6 +1,6 @@
 {
 	"module":"m2py",
-	"about":"Python 3.7 library wrapper",
+	"about":"Python 3.7 language wrapper",
 	"author":"Hezkore",
 	"version":"1.0.0",
 	"support":"http://hezkore.com",

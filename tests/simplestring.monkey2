@@ -22,8 +22,13 @@ Function Main()
 	Py_SetProgramName( program )
 	Py_Initialize()
 	
-	Print "Python says:"
-	PyRun_SimpleString( "print( 1 + 2 )" )
+	Local script := "x = 11~nprint( x * '*' )~nprint( 'Hello World' )~nprint( x * '*' )"
+	
+	Print "Executing script:~n" + script
+	Print "~nResult:"
+	PyRun_SimpleString( script )
+	
+	Sleep( 20 )
 	
 	If Py_FinalizeEx() < 0 Then Return
 	
