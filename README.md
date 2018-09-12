@@ -1,2 +1,4 @@
 # m2py.git
-Python for Monkey 2
+Python 3.7 library wrapper for Monkey 2
+
+Tested and working on Windows x64, should work on x86 as well

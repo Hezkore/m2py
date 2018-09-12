@@ -4,13 +4,24 @@ Using std..
 #Import "../m2py"
 Using python..
 
-#Import "assets/multiply.py@/.."
+#Import "assets/stdout.py@/.."
 
-' Remember that Python's print function is rarely visible in Ted2Go
-' So make sure to run the actual executable and not via Ted!
+' Capture STDOUT and STDERR with our own functions
 
-' Example from:
-' https://docs.python.org/3/extending/embedding.html#pure-embedding
+Function OurPrint( text:String )
+	
+	libc.fputs( text, libc.stdout )
+	libc.fflush( libc.stdout )
+End
+
+Function OurError( text:String )
+	
+	libc.fputs( text, libc.stdout )
+	libc.fflush( libc.stdout )
+	
+	libc.fputs( text, libc.stderr )
+	libc.fflush( libc.stderr )
+End
 
 Function Main()
 	
@@ -21,16 +32,18 @@ Function Main()
 		Return
 	Endif
 	
-	Local callFunc := "multiply" ' File to load & function to call
+	Local file := "stdout" ' File to load
+	Local callFunc := "multiply" ' Function to call ( and always our new own )
 	Local funcParam := New Int[]( 3, 2 ) ' Parameters to pass the function
 	
 	Local pName:PyObject Ptr, pModule:PyObject Ptr, pFunc:PyObject Ptr
 	Local pArgs:PyObject Ptr, pValue:PyObject Ptr
 	Local i:Int
 	
-	Py_Initialize()
+	Py_Initialize( OurPrint, OurError )
 	
-	pName = PyUnicode_DecodeFSDefault( callFunc )
+	' The rest is pretty much the same as the 'Pure Embedding' example
+	pName = PyUnicode_DecodeFSDefault( file )
 	' Error checking of pName left out
 	
 	pModule = PyImport_Import( pName )
@@ -51,6 +64,7 @@ Function Main()
 					Py_DECREF( pArgs )
 					Py_DECREF( pModule )
 					Print( "Cannot convert argument" )
+					Sleep( 10 )
 					
 					Return
 				End
@@ -66,6 +80,7 @@ Function Main()
 				
 				Print( "Result of call: " + PyLong_AsLong( pValue ) )
 				Py_DECREF(pValue)
+				
 				Sleep( 10 )
 			Else
 				
@@ -80,7 +95,7 @@ Function Main()
 		Else
 			
 			If PyErr_Occurred() Then PyErr_Print()
-			Print( "Cannot find function " + callFunc + " in ~q" + callFunc + ".py~q" )
+			Print( "Cannot find function " + callFunc + " in ~q" + file + ".py~q" )
 			Sleep( 10 )
 			
 			Return
@@ -89,9 +104,8 @@ Function Main()
 		Py_XDECREF(pFunc)
 		Py_DECREF(pModule)
 	Else
-		
 		PyErr_Print()
-		Print( "Failed to load script ~q" + callFunc + ".py~q" )
+		Print( "Failed to load script ~q" + file + ".py~q" )
 		Sleep( 10 )
 		
 		Return

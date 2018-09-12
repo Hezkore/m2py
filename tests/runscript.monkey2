@@ -16,8 +16,12 @@ Function Main()
 		exit_( 1 )
 	Endif
 	
-	Global program := Py_DecodeLocale( "testProgram" )
-	Py_SetProgramName( program )
+	Local program := Py_DecodeLocale( AppArgs()[0] , Null )
+	If Not program Then
+		
+		Print "Fatal error: cannot decode " + AppArgs()[0]
+		Return
+	Endif
 	
 	Local file :=  AppArgs()[1]
 	

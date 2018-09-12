@@ -61,8 +61,12 @@ End
 
 Function Main()
 	
-	Global program := "myProgram"
-	Py_SetProgramName( program )
+	Local program := Py_DecodeLocale( AppArgs()[0] , Null )
+	If Not program Then
+		
+		Print "Fatal error: cannot decode " + AppArgs()[0]
+		Return
+	Endif
 	
 	Local file := "extending" ' File to load
 	Local callFunc := "multiply" ' Function to call ( and always our new own )
@@ -78,7 +82,6 @@ Function Main()
 	
 	' The rest is pretty much the same as the 'Pure Embedding' example
 	Py_Initialize()
-	
 	
 	pName = PyUnicode_DecodeFSDefault( file )
 	' Error checking of pName left out
