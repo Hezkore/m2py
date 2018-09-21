@@ -86,12 +86,12 @@ Extern
 	'void Py_Finalize()
 	'int Py_SetStandardStreamEncoding(const char *encoding, const char *errors)
 	Function Py_SetProgramName:Void( program:WString )
-	'wchar* Py_GetProgramName()
+	Function Py_GetProgramName:WString()
 	'wchar_t* Py_GetPrefix()
 	'wchar_t* Py_GetExecPrefix()
 	'wchar_t* Py_GetProgramFullPath()
-	'wchar_t* Py_GetPath()
-	'void Py_SetPath(const wchar_t *)
+	Function Py_GetPath:WString()
+	Function Py_SetPath:Void( path:WString )
 	'const char* Py_GetVersion()
 	'const char* Py_GetPlatform()
 	'const char* Py_GetCopyright()
@@ -99,8 +99,8 @@ Extern
 	'const char* Py_GetBuildInfo()
 	'void PySys_SetArgvEx(int argc, wchar_t **argv, int updatepath)
 	'void PySys_SetArgv(int argc, wchar_t **argv)
-	'void Py_SetPythonHome(const wchar_t *home)
-	'w_char* Py_GetPythonHome()
+	Function Py_SetPythonHome:Void( home:WString )
+	Function Py_GetPythonHome:WString()
 	
 	' Operating System Utilities
 	' https://docs.python.org/3/c-api/sys.html#operating-system-utilities
@@ -120,7 +120,7 @@ Extern
 	'void PySys_ResetWarnOptions()
 	'void PySys_AddWarnOption(const wchar_t *s)
 	'void PySys_AddWarnOptionUnicode(PyObject *unicode)
-	'void PySys_SetPath(const wchar_t *path)
+	Function PySys_SetPath:Void( path:WString )
 	'void PySys_WriteStdout(const char *format, ...)
 	'void PySys_WriteStderr(const char *format, ...)
 	'void PySys_FormatStdout(const char *format, ...)
@@ -203,11 +203,11 @@ Extern
 	' https://docs.python.org/3/c-api/import.html#importing-modules
 	Function PyImport_ImportModule:PyObject Ptr( name:CString )
 	'PyObject* PyImport_ImportModuleNoBlock(const char *name)
-	'PyObject* PyImport_ImportModuleEx(const char *name, PyObject *globals, PyObject *locals, PyObject *fromlist)
+	Function PyImport_ImportModuleEx:PyObject Ptr( name:CString, globals:PyObject Ptr, locals:PyObject Ptr, fromlist:PyObject Ptr )
 	'PyObject* PyImport_ImportModuleLevelObject(PyObject *name, PyObject *globals, PyObject *locals, PyObject *fromlist, int level)
 	'PyObject* PyImport_ImportModuleLevel(const char *name, PyObject *globals, PyObject *locals, PyObject *fromlist, int level)
 	Function PyImport_Import:PyObject Ptr( name:PyObject Ptr )
-	'PyObject* PyImport_ReloadModule(PyObject *m)
+	Function PyImport_ReloadModule:PyObject Ptr( m:PyObject Ptr )
 	'PyObject* PyImport_AddModuleObject(PyObject *name)
 	Function PyImport_AddModule:PyObject Ptr( name:CString )
 	'PyObject* PyImport_ExecCodeModule(const char *name, PyObject *co)
@@ -446,11 +446,19 @@ Extern
 	' https://docs.python.org/3/c-api/unicode.html#unicode-objects-and-codecs
 	Function PyUnicode_Check:Int( o:PyObject Ptr )
 	Function PyUnicode_FromString:PyObject Ptr( str:CString )
+	Function PyUnicode_Split:PyObject Ptr( s:PyObject Ptr, sep:PyObject Ptr, maxsplit:Py_ssize_t )
+	Function PyUnicode_FromWideChar:PyObject Ptr( w:Wstring, size:Py_ssize_t )
 	Function PyUnicode_AsEncodedString:PyObject Ptr( unicode:PyObject Ptr, encoding:CString = "UTF-8", errors:CString = "strict" )
+	Function PyUnicode_AsWideCharString:WString( unicode:PyObject Ptr, size:Py_ssize_t )
+	Function PyUnicode_Join:PyObject Ptr( separator:PyObject Ptr, seq:PyObject Ptr )
 	
 	' List Objects
 	' https://docs.python.org/3/c-api/list.html#list-objects
-	Function PyList_Check:Int( p: PyObject Ptr )
+	Function PyList_Check:Int( p:PyObject Ptr )
+	Function PyList_New:PyObject Ptr( len:Py_ssize_t )
+	Function PyList_Size:Py_ssize_t( list:PyObject Ptr )
+	Function PyList_Append:Int( list:PyObject Ptr, item:PyObject Ptr )
+	Function PyList_GetItem:PyObject Ptr( list:PyObject Ptr, index:Py_ssize_t )
 	
 	' https://docs.python.org/3/c-api/module.html#initializing-c-modules
 	Struct PyModuleDef

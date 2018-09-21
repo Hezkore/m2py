@@ -40,7 +40,7 @@ Function Main()
 	Local pArgs:PyObject Ptr, pValue:PyObject Ptr
 	Local i:Int
 	
-	Py_Initialize( OurPrint, OurError )
+	M2Py_Initialize( OurPrint, OurError )
 	
 	' The rest is pretty much the same as the 'Pure Embedding' example
 	pName = PyUnicode_DecodeFSDefault( file )

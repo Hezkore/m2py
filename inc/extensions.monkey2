@@ -1,42 +1,78 @@
 Namespace python
 
-Function Py_Initialize( stdOutFunc:Void( text:String ), stdErrFunc:Void( text:String ) )
+Function M2Py_Initialize( stdOutFunc:Void( text:String ), stdErrFunc:Void( text:String ) )
 	
-	Py_StdOutFunc = stdOutFunc
-	Py_StdErrFunc = stdErrFunc
+	M2Py_StdOutFunc = stdOutFunc
+	M2Py_StdErrFunc = stdErrFunc
 	
-	PyImport_AppendInittab( ToConstCharTPtr( "__monkey2__" ), PyInit_monkey2 )
+	PyImport_AppendInittab( ToConstCharTPtr( "__monkey2__" ), M2PyInit_monkey2 )
 	
 	Py_Initialize()
 	
-	Py_RedirectStd()
+	M2Py_RedirectStd()
+End
+
+'PySys_SetPath ?
+
+Function M2Py_SetSysPath( paths:String )
+	
+	paths = paths.Replace( "/", "\" )
+	
+	PySys_SetPath( paths )
+End
+
+Function M2Py_AppendPath( paths:String )
+	
+	paths = paths.Replace( "/", "\" )
+	
+	Local sys := PyImport_ImportModule( "sys" )
+	
+	Local path := PyObject_GetAttrString( sys, "path" )
+	
+	Local newPaths := PyUnicode_Split( PyUnicode_FromWideChar( paths, -1 ), PyUnicode_FromWideChar( ":", 1 ), -1 )
+	
+	For Local i:Int=0 Until PyList_Size( newPaths )
+		
+		PyList_Append( path, PyList_GetItem( newPaths, i ) )
+	Next
+End
+
+Function M2Py_GetSysPath:String()
+	
+	Local sys := PyImport_ImportModule( "sys" )
+	
+	Local path := PyObject_GetAttrString( sys, "path" )
+	
+	Local newlist := PyUnicode_Join( PyUnicode_FromWideChar( ":", -1 ), path )
+	
+	Return PyUnicode_AsWideCharString( newlist, Null )
 End
 
 Private
 	
-	Global Py_StdOutFunc:Void( text:String )
-	Global Py_StdErrFunc:Void( text:String )
+	Global M2Py_StdOutFunc:Void( text:String )
+	Global M2Py_StdErrFunc:Void( text:String )
 	
-	Function Py_RedirectStd( moduleName:String = "__monkey2__", stdoutFunc:String = "print", stderrFunc:String = "error" )
+	Function M2Py_RedirectStd( moduleName:String = "__monkey2__", stdoutFunc:String = "print", stderrFunc:String = "error" )
 		
 		PyRun_SimpleString( "import sys, " + moduleName + "
 		~nclass CatchStdout:
 		~n~tdef write(self, txt):
 		~n~t~t" + moduleName + "." + stdoutFunc + "(txt)
 		~n~tdef flush(self):
-		~n~t~t" + moduleName + "." + stdoutFunc + "('')
+		~n~t~tpass
 		~nclass CatchStderr:
 		~n~tdef write(self, txt):
 		~n~t~t" + moduleName + "." + stderrFunc + "(txt)
 		~n~tdef flush(self):
-		~n~t~t" + moduleName + "." + stdoutFunc + "('')
+		~n~t~tpass
 		~nCatchStdout = CatchStdout()
 		~nCatchStderr = CatchStderr()
 		~nsys.stdout = CatchStdout
 		~nsys.stderr = CatchStderr" )
 	End
 	
-	Function PyInit_monkey2:PyObject Ptr()
+	Function M2PyInit_monkey2:PyObject Ptr()
 		
 		' Create methods array
 		' VERY IMPORTANT!!
@@ -76,7 +112,7 @@ Private
 		
 		If Not PyBytes_Check( temp_bytes ) Then Return PyErr_SetFromErrno( PyExc_Exception )
 		
-		Py_StdOutFunc( PyBytes_AsString( temp_bytes ) )
+		M2Py_StdOutFunc( PyBytes_AsString( temp_bytes ) )
 		
 		Return temp_bytes
 	End
@@ -90,7 +126,7 @@ Private
 		
 		If Not PyBytes_Check( temp_bytes ) Then Return PyErr_SetFromErrno( PyExc_Exception )
 		
-		Py_StdErrFunc( PyBytes_AsString( temp_bytes ) )
+		M2Py_StdErrFunc( PyBytes_AsString( temp_bytes ) )
 		
 		Return temp_bytes
 	End
